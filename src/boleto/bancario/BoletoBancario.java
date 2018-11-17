@@ -59,7 +59,7 @@ public class BoletoBancario {
                  * INFORMANDO DADOS SOBRE O SACADOR AVALISTA.
          */
         SacadorAvalista sacadorAvalista = new SacadorAvalista("JRimum Enterprise", "00.000.000/0001-91");
-
+        
         // Informando o endereço do sacador avalista.
         Endereco enderecoSacAval = new Endereco();
         enderecoSacAval.setUF(UnidadeFederativa.DF);
