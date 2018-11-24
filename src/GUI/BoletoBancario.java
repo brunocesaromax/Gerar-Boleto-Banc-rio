@@ -74,7 +74,7 @@ public class BoletoBancario {
                  * INFORMANDO OS DADOS SOBRE O TÍTULO.
          */
         // Informando dados sobre a conta bancária do título.
-        ContaBancaria contaBancaria = new ContaBancaria(BancosSuportados.BANCO_BRADESCO.create());
+        ContaBancaria contaBancaria = new ContaBancaria(BancosSuportados.BANCO_DO_BRASIL.create());
         contaBancaria.setNumeroDaConta(new NumeroDaConta(123456, "0"));
         contaBancaria.setCarteira(new Carteira(30));
         contaBancaria.setAgencia(new org.jrimum.domkee.financeiro.banco.febraban.Agencia(1234, "1"));
