@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Date;
+import javax.swing.JOptionPane;
 import org.jrimum.bopepo.BancosSuportados;
 import org.jrimum.bopepo.Boleto;
 import org.jrimum.bopepo.view.BoletoViewer;
@@ -34,7 +35,7 @@ public class BoletoBancario {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-
+        
         /*
                  * INFORMANDO DADOS SOBRE O CEDENTE.
          */
@@ -59,7 +60,7 @@ public class BoletoBancario {
                  * INFORMANDO DADOS SOBRE O SACADOR AVALISTA.
          */
         SacadorAvalista sacadorAvalista = new SacadorAvalista("JRimum Enterprise", "00.000.000/0001-91");
-        
+
         // Informando o endereço do sacador avalista.
         Endereco enderecoSacAval = new Endereco();
         enderecoSacAval.setUF(UnidadeFederativa.DF);

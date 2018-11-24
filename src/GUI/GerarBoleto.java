@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Date;
+import javax.swing.JOptionPane;
 import org.jrimum.bopepo.BancosSuportados;
 import org.jrimum.bopepo.Boleto;
 import org.jrimum.bopepo.view.BoletoViewer;
@@ -826,8 +827,8 @@ public class GerarBoleto extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void GerarBoletojButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GerarBoletojButtonActionPerformed
-
-        Cedente cedente = new Cedente(NomeCedentejTextField.getText(), CPFCNPJCedentejTextField.getText());
+        
+        Cedente cedente = new Cedente(NomeCedentejTextField.getText(), onlyNumbers(CPFCNPJCedentejTextField.getText()));
 
         //Dados Sacado
         Sacado sacado = new Sacado(NomeSacadorjTextField.getText(), CPFCNPSacadorjTextField.getText());
@@ -836,19 +837,19 @@ public class GerarBoleto extends javax.swing.JFrame {
         Endereco enderecoSac = new Endereco();
         enderecoSac.setUF(UnidadeFederativa.RN); // todo: Alterar jcomboBox
         enderecoSac.setLocalidade(LocalidadeSacadorjTextField1.getText());
-        enderecoSac.setCep(new CEP(CEPSacadorjTextField1.getText()));
+        enderecoSac.setCep(new CEP(onlyNumbers(CEPSacadorjTextField1.getText())));
         enderecoSac.setBairro(BairroSacadorjTextField.getText());
         enderecoSac.setLogradouro(LogradouroSacadorjTextField.getText());
         enderecoSac.setNumero(NumeroSacadorjTextField.getText());
         sacado.addEndereco(enderecoSac);
 
         // Informando o endereço do sacador avalista.
-        SacadorAvalista sacadorAvalista = new SacadorAvalista(NomeSacadorAvalistajTextField1.getText(), CPFCNPSacadorAvalistajTextField1.getText());
+        SacadorAvalista sacadorAvalista = new SacadorAvalista(NomeSacadorAvalistajTextField1.getText(), onlyNumbers(CPFCNPSacadorAvalistajTextField1.getText()));
 
         Endereco enderecoSacAval = new Endereco();
         enderecoSacAval.setUF(UnidadeFederativa.DF);
         enderecoSacAval.setLocalidade(LocalidadeSacadorAvalistajTextField2.getText());
-        enderecoSacAval.setCep(new CEP(CEPSacadorAvalistajTextField2.getText()));
+        enderecoSacAval.setCep(new CEP(onlyNumbers(CEPSacadorAvalistajTextField2.getText())));
         enderecoSacAval.setBairro(BairroSacadorAvalistajTextField1.getText());
         enderecoSacAval.setLogradouro(LogradouroSacadorAvalistajTextField1.getText());
         enderecoSacAval.setNumero(NumeroSacadorAvalistajTextField1.getText());
@@ -863,7 +864,7 @@ public class GerarBoleto extends javax.swing.JFrame {
         // Dados Titulo
         Titulo titulo = new Titulo(contaBancaria, sacado, cedente, sacadorAvalista);
         titulo.setNumeroDoDocumento(NumeroDocumentojTextField1.getText());
-        titulo.setNossoNumero(NossoNumerojTextField2.getText());
+        titulo.setNossoNumero(onlyNumbers(NossoNumerojTextField2.getText()));
         titulo.setDigitoDoNossoNumero(DigitoNossoNumerojTextField1.getText());
         titulo.setValor(BigDecimal.valueOf(Long.parseLong(ValorjTextField3.getText())));
         titulo.setDataDoDocumento(new Date());
@@ -891,8 +892,12 @@ public class GerarBoleto extends javax.swing.JFrame {
         boleto.setInstrucao8(Instrucao08jTextField10.getText());
 
         BoletoViewer boletoViewer = new BoletoViewer(boleto);
-
-        File arquivoPdf = boletoViewer.getPdfAsFile("MeuPrimeiroBoleto.pdf");
+        
+        String nomeArquivo = JOptionPane.showInputDialog("Nome do arquivo que será gerado:");
+        if(nomeArquivo.isEmpty() || nomeArquivo == null) nomeArquivo = "Boleto-bancario.pdf";
+        if(!nomeArquivo.contains(".pdf")) nomeArquivo+=".pdf";
+        
+        File arquivoPdf = boletoViewer.getPdfAsFile(nomeArquivo);
 
         // Mostrando o boleto gerado na tela.
         mostreBoletoNaTela(arquivoPdf);
@@ -1088,4 +1093,14 @@ public class GerarBoleto extends javax.swing.JFrame {
     private javax.swing.JTabbedPane jTabbedPane5;
     private javax.swing.JTabbedPane jTabbedPane6;
     // End of variables declaration//GEN-END:variables
+
+    private String onlyNumbers(String text) {
+            
+            if(text.matches("[0-9]+")){
+                text = text.replace("-", ".");
+                text = text.replace(".", "");
+            } 
+            
+            return text;
+    }
 }
