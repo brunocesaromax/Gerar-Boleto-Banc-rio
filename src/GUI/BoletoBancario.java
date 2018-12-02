@@ -35,7 +35,7 @@ public class BoletoBancario {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        
+     
         /*
                  * INFORMANDO DADOS SOBRE O CEDENTE.
          */

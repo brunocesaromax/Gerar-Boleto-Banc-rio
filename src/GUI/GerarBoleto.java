@@ -8,19 +8,21 @@ package GUI;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import org.jrimum.bopepo.BancosSuportados;
 import org.jrimum.bopepo.Boleto;
-import org.jrimum.bopepo.view.BoletoViewer;
 import org.jrimum.domkee.comum.pessoa.endereco.CEP;
 import org.jrimum.domkee.comum.pessoa.endereco.Endereco;
 import org.jrimum.domkee.comum.pessoa.endereco.UnidadeFederativa;
-import org.jrimum.domkee.financeiro.banco.febraban.Agencia;
-import org.jrimum.domkee.financeiro.banco.febraban.Carteira;
 import org.jrimum.domkee.financeiro.banco.febraban.Cedente;
 import org.jrimum.domkee.financeiro.banco.febraban.ContaBancaria;
-import org.jrimum.domkee.financeiro.banco.febraban.NumeroDaConta;
 import org.jrimum.domkee.financeiro.banco.febraban.Sacado;
 import org.jrimum.domkee.financeiro.banco.febraban.SacadorAvalista;
 import org.jrimum.domkee.financeiro.banco.febraban.TipoDeTitulo;
@@ -32,11 +34,28 @@ import org.jrimum.domkee.financeiro.banco.febraban.Titulo;
  */
 public class GerarBoleto extends javax.swing.JFrame {
 
+    private Cedente cedente;
+    private Sacado sacado;
+    private SacadorAvalista sacadorAvalista;
+    private Titulo titulo = new Titulo(new ContaBancaria(), new Sacado(null), new Cedente(null));
+    private Boleto boleto;
+    private Endereco enderecoSac;
+    private Endereco enderecoSacAvalista;
+    private final SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+
     public GerarBoleto() {
+
         initComponents();
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        //Inicializando componentes jComboBox
+        inicializarUFS();
+        inicializarTiposDocumentos();
+        inicializarAceite();
+        inicializarBancos();
+
     }
-    
-    
+
     /**
      * Exibe o arquivo na tela.
      *
@@ -72,13 +91,13 @@ public class GerarBoleto extends javax.swing.JFrame {
         jSeparator4 = new javax.swing.JSeparator();
         jPanel7 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
-        GerarBoletojButton = new javax.swing.JButton();
         GerarBoletojTabbedPane = new javax.swing.JTabbedPane();
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         NomeCedentejTextField = new javax.swing.JTextField();
         CPFCNPJCedentejTextField = new javax.swing.JTextField();
+        Avancar0jButton = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         NomeSacadorjTextField = new javax.swing.JTextField();
@@ -97,6 +116,8 @@ public class GerarBoleto extends javax.swing.JFrame {
         BairroSacadorjTextField = new javax.swing.JTextField();
         LogradouroSacadorjTextField = new javax.swing.JTextField();
         NumeroSacadorjTextField = new javax.swing.JTextField();
+        Avançar1jButton = new javax.swing.JButton();
+        Voltar1jButton = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jLabel12 = new javax.swing.JLabel();
         NomeSacadorAvalistajTextField1 = new javax.swing.JTextField();
@@ -115,17 +136,8 @@ public class GerarBoleto extends javax.swing.JFrame {
         LogradouroSacadorAvalistajTextField1 = new javax.swing.JTextField();
         jLabel20 = new javax.swing.JLabel();
         NumeroSacadorAvalistajTextField1 = new javax.swing.JTextField();
-        jPanel5 = new javax.swing.JPanel();
-        jLabel21 = new javax.swing.JLabel();
-        jLabel22 = new javax.swing.JLabel();
-        jLabel23 = new javax.swing.JLabel();
-        jLabel24 = new javax.swing.JLabel();
-        BancojComboBox = new javax.swing.JComboBox<>();
-        NumeroContajTextField = new javax.swing.JTextField();
-        DigitoContajTextField = new javax.swing.JTextField();
-        CarteirajTextField = new javax.swing.JTextField();
-        NumeroAgenciajTextField = new javax.swing.JTextField();
-        DigitoAgenciajTextField = new javax.swing.JTextField();
+        Avançar2jButton = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
         jPanel6 = new javax.swing.JPanel();
         jLabel25 = new javax.swing.JLabel();
         jLabel26 = new javax.swing.JLabel();
@@ -144,14 +156,16 @@ public class GerarBoleto extends javax.swing.JFrame {
         NumeroDocumentojTextField1 = new javax.swing.JTextField();
         NossoNumerojTextField2 = new javax.swing.JTextField();
         ValorjTextField3 = new javax.swing.JTextField();
-        DataDocumentojTextField4 = new javax.swing.JTextField();
-        DataVencimentojTextField5 = new javax.swing.JTextField();
         DescontojTextField6 = new javax.swing.JTextField();
         DeducaojTextField7 = new javax.swing.JTextField();
         MorajTextField8 = new javax.swing.JTextField();
         AcrescimojTextField9 = new javax.swing.JTextField();
         ValorCobradojTextField10 = new javax.swing.JTextField();
         DigitoNossoNumerojTextField1 = new javax.swing.JTextField();
+        Avançar4jButton = new javax.swing.JButton();
+        Voltar3jButton1 = new javax.swing.JButton();
+        DataDocumentojFormattedTextField1 = new javax.swing.JFormattedTextField();
+        DataVencimentojFormattedTextField1 = new javax.swing.JFormattedTextField();
         jPanel8 = new javax.swing.JPanel();
         jLabel37 = new javax.swing.JLabel();
         jLabel38 = new javax.swing.JLabel();
@@ -174,6 +188,21 @@ public class GerarBoleto extends javax.swing.JFrame {
         Instrucao06jTextField8 = new javax.swing.JTextField();
         Instrucao07jTextField9 = new javax.swing.JTextField();
         Instrucao08jTextField10 = new javax.swing.JTextField();
+        Voltar4Jbutton = new javax.swing.JButton();
+        Avancar5jButton = new javax.swing.JButton();
+        jPanel5 = new javax.swing.JPanel();
+        jLabel21 = new javax.swing.JLabel();
+        jLabel22 = new javax.swing.JLabel();
+        jLabel23 = new javax.swing.JLabel();
+        jLabel24 = new javax.swing.JLabel();
+        BancojComboBox = new javax.swing.JComboBox<>();
+        NumeroContajTextField = new javax.swing.JTextField();
+        DigitoContajTextField = new javax.swing.JTextField();
+        CarteirajTextField = new javax.swing.JTextField();
+        NumeroAgenciajTextField = new javax.swing.JTextField();
+        DigitoAgenciajTextField = new javax.swing.JTextField();
+        Voltar2jButton = new javax.swing.JButton();
+        GerarBoletojButton1 = new javax.swing.JButton();
 
         jTabbedPane5.addTab("tab1", jTabbedPane6);
 
@@ -194,13 +223,6 @@ public class GerarBoleto extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        GerarBoletojButton.setText("Gerar Boleto");
-        GerarBoletojButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                GerarBoletojButtonActionPerformed(evt);
-            }
-        });
-
         jLabel1.setText("Nome:");
 
         jLabel2.setText("CPF/CNPJ:");
@@ -208,6 +230,13 @@ public class GerarBoleto extends javax.swing.JFrame {
         NomeCedentejTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 NomeCedentejTextFieldActionPerformed(evt);
+            }
+        });
+
+        Avancar0jButton.setText("Avançar");
+        Avancar0jButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Avancar0jButtonActionPerformed(evt);
             }
         });
 
@@ -226,7 +255,10 @@ public class GerarBoleto extends javax.swing.JFrame {
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(CPFCNPJCedentejTextField)))
-                .addContainerGap(41, Short.MAX_VALUE))
+                .addContainerGap(53, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(Avancar0jButton, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -239,7 +271,8 @@ public class GerarBoleto extends javax.swing.JFrame {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(CPFCNPJCedentejTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(445, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 439, Short.MAX_VALUE)
+                .addComponent(Avancar0jButton))
         );
 
         GerarBoletojTabbedPane.addTab("Cedente", jPanel2);
@@ -287,46 +320,78 @@ public class GerarBoleto extends javax.swing.JFrame {
             }
         });
 
+        BairroSacadorjTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BairroSacadorjTextFieldActionPerformed(evt);
+            }
+        });
+
+        LogradouroSacadorjTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                LogradouroSacadorjTextFieldActionPerformed(evt);
+            }
+        });
+
+        NumeroSacadorjTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                NumeroSacadorjTextFieldActionPerformed(evt);
+            }
+        });
+
+        Avançar1jButton.setText("Avançar");
+        Avançar1jButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Avançar1jButtonActionPerformed(evt);
+            }
+        });
+
+        Voltar1jButton.setText("Voltar");
+        Voltar1jButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Voltar1jButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addGroup(jPanel3Layout.createSequentialGroup()
-                            .addComponent(jLabel3)
-                            .addGap(40, 40, 40)
-                            .addComponent(NomeSacadorjTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 650, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGroup(jPanel3Layout.createSequentialGroup()
-                            .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jLabel4)
-                                .addComponent(jLabel5)
-                                .addComponent(jLabel7))
-                            .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(jPanel3Layout.createSequentialGroup()
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                        .addComponent(NumeroSacadorjTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 362, Short.MAX_VALUE)
-                                        .addComponent(LogradouroSacadorjTextField)
-                                        .addComponent(BairroSacadorjTextField)
-                                        .addComponent(UFSacadorjComboBox, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(LocalidadeSacadorjTextField1, javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(CEPSacadorjTextField1, javax.swing.GroupLayout.Alignment.LEADING))
-                                    .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(CPFCNPSacadorjTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 674, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addContainerGap()))))
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addGap(40, 40, 40)
+                        .addComponent(NomeSacadorjTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 650, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel10)
-                            .addComponent(jLabel6)
-                            .addComponent(jLabel8)
+                            .addComponent(jLabel4)
+                            .addComponent(jLabel5)
+                            .addComponent(jLabel7)
                             .addComponent(jLabel9)
                             .addComponent(jLabel11))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(CPFCNPSacadorjTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 674, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addComponent(jLabel10)
+                        .addGap(5, 5, 5)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(NumeroSacadorjTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 362, Short.MAX_VALUE)
+                            .addComponent(LogradouroSacadorjTextField)
+                            .addComponent(BairroSacadorjTextField)
+                            .addComponent(UFSacadorjComboBox, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(LocalidadeSacadorjTextField1, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(CEPSacadorjTextField1, javax.swing.GroupLayout.Alignment.LEADING))))
+                .addGap(0, 0, Short.MAX_VALUE))
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel6)
+                    .addComponent(Voltar1jButton, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGap(14, 14, 14)
+                        .addComponent(jLabel8)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 619, Short.MAX_VALUE)
+                .addComponent(Avançar1jButton, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -365,7 +430,10 @@ public class GerarBoleto extends javax.swing.JFrame {
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel11)
                     .addComponent(NumeroSacadorjTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(149, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 143, Short.MAX_VALUE)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(Avançar1jButton)
+                    .addComponent(Voltar1jButton)))
         );
 
         GerarBoletojTabbedPane.addTab("Dados Sacado", jPanel3);
@@ -413,6 +481,20 @@ public class GerarBoleto extends javax.swing.JFrame {
 
         jLabel20.setText("Número:");
 
+        Avançar2jButton.setText("Avançar");
+        Avançar2jButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Avançar2jButtonActionPerformed(evt);
+            }
+        });
+
+        jButton1.setText("Voltar");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
@@ -429,7 +511,8 @@ public class GerarBoleto extends javax.swing.JFrame {
                             .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                 .addComponent(jLabel13)
                                 .addComponent(jLabel15)
-                                .addComponent(jLabel16))
+                                .addComponent(jLabel16)
+                                .addComponent(jLabel20))
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                             .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                 .addComponent(CPFCNPSacadorAvalistajTextField1)
@@ -445,9 +528,12 @@ public class GerarBoleto extends javax.swing.JFrame {
                     .addComponent(jLabel19)
                     .addComponent(jLabel14)
                     .addComponent(jLabel17)
-                    .addComponent(jLabel18)
-                    .addComponent(jLabel20))
-                .addContainerGap(41, Short.MAX_VALUE))
+                    .addComponent(jLabel18))
+                .addContainerGap(53, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(Avançar2jButton, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -486,78 +572,13 @@ public class GerarBoleto extends javax.swing.JFrame {
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel20)
                     .addComponent(NumeroSacadorAvalistajTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(149, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 143, Short.MAX_VALUE)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(Avançar2jButton)
+                    .addComponent(jButton1)))
         );
 
         GerarBoletojTabbedPane.addTab("Dados Sacador Avalista", jPanel4);
-
-        jLabel21.setText("Banco:");
-
-        jLabel22.setText("Número da Conta:");
-
-        jLabel23.setText("Carteira:");
-
-        jLabel24.setText("Agência:");
-
-        NumeroAgenciajTextField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                NumeroAgenciajTextFieldActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
-        jPanel5.setLayout(jPanel5Layout);
-        jPanel5Layout.setHorizontalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addComponent(jLabel21)
-                        .addGap(94, 94, 94)
-                        .addComponent(BancojComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel22)
-                            .addComponent(jLabel23)
-                            .addComponent(jLabel24))
-                        .addGap(18, 18, 18)
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(NumeroContajTextField)
-                            .addComponent(CarteirajTextField)
-                            .addComponent(NumeroAgenciajTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 106, Short.MAX_VALUE))))
-                .addGap(25, 25, 25)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(DigitoContajTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 46, Short.MAX_VALUE)
-                    .addComponent(DigitoAgenciajTextField))
-                .addContainerGap(456, Short.MAX_VALUE))
-        );
-        jPanel5Layout.setVerticalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
-                .addGap(39, 39, 39)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel21)
-                    .addComponent(BancojComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel22)
-                    .addComponent(NumeroContajTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(DigitoContajTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel23)
-                    .addComponent(CarteirajTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel24)
-                    .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(NumeroAgenciajTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(DigitoAgenciajTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(361, Short.MAX_VALUE))
-        );
-
-        GerarBoletojTabbedPane.addTab("Dados Conta bancária", jPanel5);
 
         jLabel25.setText("Número do Documento:");
 
@@ -583,6 +604,38 @@ public class GerarBoleto extends javax.swing.JFrame {
 
         jLabel36.setText("Valor Cobrado:");
 
+        TipoDocumentojComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                TipoDocumentojComboBoxActionPerformed(evt);
+            }
+        });
+
+        Avançar4jButton.setText("Avançar");
+        Avançar4jButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Avançar4jButtonActionPerformed(evt);
+            }
+        });
+
+        Voltar3jButton1.setText("Voltar");
+        Voltar3jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Voltar3jButton1ActionPerformed(evt);
+            }
+        });
+
+        try {
+            DataDocumentojFormattedTextField1.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##-##-####")));
+        } catch (java.text.ParseException ex) {
+            ex.printStackTrace();
+        }
+
+        try {
+            DataVencimentojFormattedTextField1.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##-##-####")));
+        } catch (java.text.ParseException ex) {
+            ex.printStackTrace();
+        }
+
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
         jPanel6Layout.setHorizontalGroup(
@@ -601,11 +654,12 @@ public class GerarBoleto extends javax.swing.JFrame {
                         .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(NumeroDocumentojTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 196, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(jPanel6Layout.createSequentialGroup()
-                                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(DataVencimentojTextField5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 144, Short.MAX_VALUE)
-                                    .addComponent(DataDocumentojTextField4, javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(ValorjTextField3, javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(NossoNumerojTextField2, javax.swing.GroupLayout.Alignment.LEADING))
+                                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(DataVencimentojFormattedTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                        .addComponent(DataDocumentojFormattedTextField1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 144, Short.MAX_VALUE)
+                                        .addComponent(ValorjTextField3, javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(NossoNumerojTextField2, javax.swing.GroupLayout.Alignment.LEADING)))
                                 .addGap(53, 53, 53)
                                 .addComponent(DigitoNossoNumerojTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))))
                     .addGroup(jPanel6Layout.createSequentialGroup()
@@ -627,7 +681,11 @@ public class GerarBoleto extends javax.swing.JFrame {
                                 .addComponent(DeducaojTextField7, javax.swing.GroupLayout.Alignment.LEADING)
                                 .addComponent(DescontojTextField6, javax.swing.GroupLayout.Alignment.LEADING)
                                 .addComponent(AceitejComboBox, javax.swing.GroupLayout.Alignment.LEADING, 0, 136, Short.MAX_VALUE)))))
-                .addContainerGap(289, Short.MAX_VALUE))
+                .addContainerGap(301, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
+                .addComponent(Voltar3jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(Avançar4jButton, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -648,11 +706,11 @@ public class GerarBoleto extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel29)
-                    .addComponent(DataDocumentojTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(DataDocumentojFormattedTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel28)
-                    .addComponent(DataVencimentojTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(DataVencimentojFormattedTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel30)
@@ -681,7 +739,10 @@ public class GerarBoleto extends javax.swing.JFrame {
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel36)
                     .addComponent(ValorCobradojTextField10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(Avançar4jButton)
+                    .addComponent(Voltar3jButton1)))
         );
 
         GerarBoletojTabbedPane.addTab("Dados Título", jPanel6);
@@ -709,6 +770,20 @@ public class GerarBoleto extends javax.swing.JFrame {
 
         jLabel47.setText("Instrução 8:");
 
+        Voltar4Jbutton.setText("Voltar");
+        Voltar4Jbutton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Voltar4JbuttonActionPerformed(evt);
+            }
+        });
+
+        Avancar5jButton.setText("Avançar");
+        Avancar5jButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Avancar5jButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
         jPanel8.setLayout(jPanel8Layout);
         jPanel8Layout.setHorizontalGroup(
@@ -731,7 +806,7 @@ public class GerarBoleto extends javax.swing.JFrame {
                             .addComponent(jLabel47))
                         .addGap(18, 18, 18)
                         .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(Instrucao01jTextField3, javax.swing.GroupLayout.DEFAULT_SIZE, 602, Short.MAX_VALUE)
+                            .addComponent(Instrucao01jTextField3, javax.swing.GroupLayout.DEFAULT_SIZE, 614, Short.MAX_VALUE)
                             .addComponent(Instrucao02jTextField4)
                             .addComponent(Instrucao03jTextField5)
                             .addComponent(Instrucao04jTextField6)
@@ -742,6 +817,10 @@ public class GerarBoleto extends javax.swing.JFrame {
                             .addComponent(LocalPagamentojTextField1)
                             .addComponent(InstrucaoSacadojTextField2))))
                 .addContainerGap())
+            .addGroup(jPanel8Layout.createSequentialGroup()
+                .addComponent(Voltar4Jbutton, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(Avancar5jButton, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         jPanel8Layout.setVerticalGroup(
             jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -788,28 +867,114 @@ public class GerarBoleto extends javax.swing.JFrame {
                 .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel47)
                     .addComponent(Instrucao08jTextField10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(103, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 97, Short.MAX_VALUE)
+                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(Voltar4Jbutton)
+                    .addComponent(Avancar5jButton)))
         );
 
         GerarBoletojTabbedPane.addTab("Dados Boleto", jPanel8);
+
+        jLabel21.setText("Banco:");
+
+        jLabel22.setText("Número da Conta:");
+
+        jLabel23.setText("Carteira:");
+
+        jLabel24.setText("Agência:");
+
+        NumeroAgenciajTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                NumeroAgenciajTextFieldActionPerformed(evt);
+            }
+        });
+
+        Voltar2jButton.setText("Voltar");
+        Voltar2jButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Voltar2jButtonActionPerformed(evt);
+            }
+        });
+
+        GerarBoletojButton1.setText("Gerar Boleto");
+        GerarBoletojButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                GerarBoletojButton1ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel22)
+                            .addComponent(jLabel23)
+                            .addComponent(jLabel24))
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(NumeroContajTextField)
+                            .addComponent(CarteirajTextField)
+                            .addComponent(NumeroAgenciajTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 106, Short.MAX_VALUE))
+                        .addGap(25, 25, 25)
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(DigitoContajTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 46, Short.MAX_VALUE)
+                            .addComponent(DigitoAgenciajTextField)))
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addComponent(jLabel21)
+                        .addGap(94, 94, 94)
+                        .addComponent(BancojComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 320, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(327, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                .addComponent(Voltar2jButton, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(GerarBoletojButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addGap(39, 39, 39)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel21)
+                    .addComponent(BancojComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel22)
+                    .addComponent(NumeroContajTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(DigitoContajTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel23)
+                    .addComponent(CarteirajTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel24)
+                    .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(NumeroAgenciajTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(DigitoAgenciajTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 355, Short.MAX_VALUE)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(Voltar2jButton)
+                    .addComponent(GerarBoletojButton1)))
+        );
+
+        GerarBoletojTabbedPane.addTab("Dados Conta bancária", jPanel5);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(GerarBoletojTabbedPane)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(290, 290, 290)
-                .addComponent(GerarBoletojButton, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addComponent(GerarBoletojTabbedPane)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(GerarBoletojButton)
-                .addGap(6, 6, 6))
+                .addGap(3, 3, 3))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -826,9 +991,54 @@ public class GerarBoleto extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void GerarBoletojButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GerarBoletojButtonActionPerformed
-        
-        Cedente cedente = new Cedente(NomeCedentejTextField.getText(), onlyNumbers(CPFCNPJCedentejTextField.getText()));
+    private void NomeCedentejTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_NomeCedentejTextFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_NomeCedentejTextFieldActionPerformed
+
+    private void NomeSacadorjTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_NomeSacadorjTextFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_NomeSacadorjTextFieldActionPerformed
+
+    private void UFSacadorjComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_UFSacadorjComboBoxActionPerformed
+
+
+    }//GEN-LAST:event_UFSacadorjComboBoxActionPerformed
+
+    private void LocalidadeSacadorjTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LocalidadeSacadorjTextField1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_LocalidadeSacadorjTextField1ActionPerformed
+
+    private void CEPSacadorjTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CEPSacadorjTextField1ActionPerformed
+
+        if (LocalidadeSacadorjTextField1.getText().isEmpty() || LocalidadeSacadorjTextField1.getText() == null) {
+            JOptionPane.showMessageDialog(null, "Localidade não pode ser um campo em branco.");
+            return;
+        }
+    }//GEN-LAST:event_CEPSacadorjTextField1ActionPerformed
+
+    private void NomeSacadorAvalistajTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_NomeSacadorAvalistajTextField1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_NomeSacadorAvalistajTextField1ActionPerformed
+
+    private void UFSacadorAvalistajComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_UFSacadorAvalistajComboBox1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_UFSacadorAvalistajComboBox1ActionPerformed
+
+    private void LocalidadeSacadorAvalistajTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LocalidadeSacadorAvalistajTextField2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_LocalidadeSacadorAvalistajTextField2ActionPerformed
+
+    private void CEPSacadorAvalistajTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CEPSacadorAvalistajTextField2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_CEPSacadorAvalistajTextField2ActionPerformed
+
+    private void NumeroAgenciajTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_NumeroAgenciajTextFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_NumeroAgenciajTextFieldActionPerformed
+
+    private void GerarBoletojButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GerarBoletojButton1ActionPerformed
+
+        /*Cedente cedente = new Cedente(NomeCedentejTextField.getText(), onlyNumbers(CPFCNPJCedentejTextField.getText()));
 
         //Dados Sacado
         Sacado sacado = new Sacado(NomeSacadorjTextField.getText(), CPFCNPSacadorjTextField.getText());
@@ -892,57 +1102,432 @@ public class GerarBoleto extends javax.swing.JFrame {
         boleto.setInstrucao8(Instrucao08jTextField10.getText());
 
         BoletoViewer boletoViewer = new BoletoViewer(boleto);
-        
+
         String nomeArquivo = JOptionPane.showInputDialog("Nome do arquivo que será gerado:");
-        if(nomeArquivo.isEmpty() || nomeArquivo == null) nomeArquivo = "Boleto-bancario.pdf";
-        if(!nomeArquivo.contains(".pdf")) nomeArquivo+=".pdf";
-        
+        if (nomeArquivo.isEmpty() || nomeArquivo == null) {
+            nomeArquivo = "Boleto-bancario.pdf";
+        }
+        if (!nomeArquivo.contains(".pdf")) {
+            nomeArquivo += ".pdf";
+        }
+
         File arquivoPdf = boletoViewer.getPdfAsFile(nomeArquivo);
 
         // Mostrando o boleto gerado na tela.
-        mostreBoletoNaTela(arquivoPdf);
+        mostreBoletoNaTela(arquivoPdf);*/
+    }//GEN-LAST:event_GerarBoletojButton1ActionPerformed
 
-    }//GEN-LAST:event_GerarBoletojButtonActionPerformed
+    private void Avancar0jButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Avancar0jButtonActionPerformed
 
-    private void NomeCedentejTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_NomeCedentejTextFieldActionPerformed
+        if (NomeCedentejTextField.getText().trim().isEmpty() || NomeCedentejTextField.getText() == null) {
+            JOptionPane.showMessageDialog(null, "Campo de nome do cedente está vazio.");
+            return;
+        }
+
+        String texto = CPFCNPJCedentejTextField.getText().replaceAll("[^0123456789]", "");
+
+        if (texto.length() <= 11) {
+
+            if (!Utilitarios.Validacao.isCPF(texto.trim())) {
+
+                JOptionPane.showMessageDialog(null, "CPF/CNPJ inválido, digite somente números.");
+                CPFCNPJCedentejTextField.setText("");
+                return;
+            }
+        } else {
+
+            if (!Utilitarios.Validacao.isCNPJ(texto.trim())) {
+
+                JOptionPane.showMessageDialog(null, "CPF/CNPJ inválido, digite somente números.");
+                CPFCNPJCedentejTextField.setText("");
+                return;
+            }
+        }
+
+        cedente = new Cedente(NomeCedentejTextField.getText(), texto);
+        titulo.setCedente(cedente);
+        GerarBoletojTabbedPane.setSelectedIndex(1);
+    }//GEN-LAST:event_Avancar0jButtonActionPerformed
+
+    private void Voltar1jButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Voltar1jButtonActionPerformed
+        GerarBoletojTabbedPane.setSelectedIndex(0);
+    }//GEN-LAST:event_Voltar1jButtonActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        GerarBoletojTabbedPane.setSelectedIndex(1);
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void Voltar3jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Voltar3jButton1ActionPerformed
+        GerarBoletojTabbedPane.setSelectedIndex(2);
+
+    }//GEN-LAST:event_Voltar3jButton1ActionPerformed
+
+    private void Voltar4JbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Voltar4JbuttonActionPerformed
+        GerarBoletojTabbedPane.setSelectedIndex(3);
+    }//GEN-LAST:event_Voltar4JbuttonActionPerformed
+
+    private void Voltar2jButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Voltar2jButtonActionPerformed
+        GerarBoletojTabbedPane.setSelectedIndex(4);
+
+    }//GEN-LAST:event_Voltar2jButtonActionPerformed
+
+    private void Avançar1jButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Avançar1jButtonActionPerformed
+
+        if (NomeSacadorjTextField.getText().trim().isEmpty() || NomeSacadorjTextField.getText() == null) {
+            JOptionPane.showMessageDialog(null, "Campo de nome do cedente está vazio.");
+            return;
+        }
+
+        String texto = CPFCNPSacadorjTextField.getText().replaceAll("[^0123456789]", "");
+
+        if (texto.length() <= 11) {
+
+            if (!Utilitarios.Validacao.isCPF(texto.trim())) {
+
+                JOptionPane.showMessageDialog(null, "CPF/CNPJ inválido, digite somente números.");
+                CPFCNPSacadorjTextField.setText("");
+                return;
+            }
+        } else {
+
+            if (!Utilitarios.Validacao.isCNPJ(texto.trim())) {
+
+                JOptionPane.showMessageDialog(null, "CPF/CNPJ inválido, digite somente números.");
+                CPFCNPSacadorjTextField.setText("");
+                return;
+            }
+        }
+
+        sacado = new Sacado(NomeSacadorjTextField.getText(), texto);
+
+        // Validações do endereco do sacado
+        if (Utilitarios.Validacao.isNullOrEmpty(LocalidadeSacadorjTextField1.getText())) {
+            JOptionPane.showMessageDialog(null, "Campo Localidade não poder ser um campo em branco.");
+            LocalidadeSacadorjTextField1.setText("");
+            return;
+        }
+
+        if (Utilitarios.Validacao.isNullOrEmpty(CEPSacadorjTextField1.getText())) {
+            JOptionPane.showMessageDialog(null, "Campo CEP não poder ser um campo em branco.");
+            CEPSacadorjTextField1.setText("");
+            return;
+        } else {
+
+            if (!Utilitarios.Validacao.validaCep(CEPSacadorjTextField1.getText())) {
+                JOptionPane.showMessageDialog(null, "Campo CEP inválido, digite apenas números.");
+                CEPSacadorjTextField1.setText("");
+                return;
+            }
+        }
+
+        if (Utilitarios.Validacao.isNullOrEmpty(BairroSacadorjTextField.getText())) {
+            JOptionPane.showMessageDialog(null, "Campo Bairro não poder ser um campo em branco.");
+            BairroSacadorjTextField.setText("");
+            return;
+        }
+
+        if (Utilitarios.Validacao.isNullOrEmpty(LogradouroSacadorjTextField.getText())) {
+            JOptionPane.showMessageDialog(null, "Campo Logradouro não poder ser um campo em branco.");
+            LogradouroSacadorjTextField.setText("");
+            return;
+        }
+
+        if (Utilitarios.Validacao.isNullOrEmpty(NumeroSacadorjTextField.getText())) {
+            JOptionPane.showMessageDialog(null, "Campo Numero não poder ser um campo em branco.");
+            NumeroSacadorjTextField.setText("");
+            return;
+        }
+
+        enderecoSac = new Endereco();
+        enderecoSac.setBairro(BairroSacadorjTextField.getText());
+        enderecoSac.setCep(new CEP(CEPSacadorjTextField1.getText()));
+        enderecoSac.setLocalidade(LocalidadeSacadorjTextField1.getText());
+        enderecoSac.setLogradouro(LogradouroSacadorjTextField.getText());
+        enderecoSac.setNumero(NumeroSacadorjTextField.getText());
+        enderecoSac.setUF(UnidadeFederativa.valueOf(String.valueOf(UFSacadorjComboBox.getSelectedItem())));
+
+        GerarBoletojTabbedPane.setSelectedIndex(2);
+    }//GEN-LAST:event_Avançar1jButtonActionPerformed
+
+    private void BairroSacadorjTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BairroSacadorjTextFieldActionPerformed
+
+
+    }//GEN-LAST:event_BairroSacadorjTextFieldActionPerformed
+
+    private void LogradouroSacadorjTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LogradouroSacadorjTextFieldActionPerformed
+
+    }//GEN-LAST:event_LogradouroSacadorjTextFieldActionPerformed
+
+    private void NumeroSacadorjTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_NumeroSacadorjTextFieldActionPerformed
+
+    }//GEN-LAST:event_NumeroSacadorjTextFieldActionPerformed
+
+    private void Avançar2jButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Avançar2jButtonActionPerformed
+
+        if (NomeSacadorAvalistajTextField1.getText().trim().isEmpty() || NomeSacadorAvalistajTextField1.getText() == null) {
+            JOptionPane.showMessageDialog(null, "Campo de nome do sacador Avalista está vazio.");
+            return;
+        }
+
+        String texto = CPFCNPSacadorAvalistajTextField1.getText().replaceAll("[^0123456789]", "");
+
+        if (texto.length() <= 11) {
+
+            if (!Utilitarios.Validacao.isCPF(texto.trim())) {
+
+                JOptionPane.showMessageDialog(null, "CPF/CNPJ inválido, digite somente números.");
+                CPFCNPSacadorAvalistajTextField1.setText("");
+                return;
+            }
+        } else {
+
+            if (!Utilitarios.Validacao.isCNPJ(texto.trim())) {
+
+                JOptionPane.showMessageDialog(null, "CPF/CNPJ inválido, digite somente números.");
+                CPFCNPSacadorAvalistajTextField1.setText("");
+                return;
+            }
+        }
+
+        sacadorAvalista = new SacadorAvalista(NomeSacadorAvalistajTextField1.getText(), texto);
+
+        // Validações do endereco do sacado
+        if (Utilitarios.Validacao.isNullOrEmpty(LocalidadeSacadorAvalistajTextField2.getText())) {
+            JOptionPane.showMessageDialog(null, "Campo Localidade não poder ser um campo em branco.");
+            LocalidadeSacadorAvalistajTextField2.setText("");
+            return;
+        }
+
+        if (Utilitarios.Validacao.isNullOrEmpty(CEPSacadorAvalistajTextField2.getText())) {
+            JOptionPane.showMessageDialog(null, "Campo CEP não poder ser um campo em branco.");
+            CEPSacadorAvalistajTextField2.setText("");
+            return;
+        } else {
+
+            if (!Utilitarios.Validacao.validaCep(CEPSacadorAvalistajTextField2.getText())) {
+                JOptionPane.showMessageDialog(null, "Campo CEP inválido, digite apenas números.");
+                CEPSacadorAvalistajTextField2.setText("");
+                return;
+            }
+        }
+
+        if (Utilitarios.Validacao.isNullOrEmpty(BairroSacadorAvalistajTextField1.getText())) {
+            JOptionPane.showMessageDialog(null, "Campo Bairro não poder ser um campo em branco.");
+            BairroSacadorAvalistajTextField1.setText("");
+            return;
+        }
+
+        if (Utilitarios.Validacao.isNullOrEmpty(LogradouroSacadorAvalistajTextField1.getText())) {
+            JOptionPane.showMessageDialog(null, "Campo Logradouro não poder ser um campo em branco.");
+            LogradouroSacadorAvalistajTextField1.setText("");
+            return;
+        }
+
+        if (Utilitarios.Validacao.isNullOrEmpty(NumeroSacadorAvalistajTextField1.getText())) {
+            JOptionPane.showMessageDialog(null, "Campo Numero não poder ser um campo em branco.");
+            NumeroSacadorAvalistajTextField1.setText("");
+            return;
+        }
+
+        enderecoSacAvalista = new Endereco();
+        enderecoSacAvalista.setBairro(BairroSacadorAvalistajTextField1.getText());
+        enderecoSacAvalista.setCep(new CEP(CEPSacadorAvalistajTextField2.getText()));
+        enderecoSacAvalista.setLocalidade(LocalidadeSacadorAvalistajTextField2.getText());
+        enderecoSacAvalista.setLogradouro(LogradouroSacadorAvalistajTextField1.getText());
+        enderecoSacAvalista.setNumero(NumeroSacadorAvalistajTextField1.getText());
+        enderecoSacAvalista.setUF(UnidadeFederativa.valueOf(String.valueOf(UFSacadorAvalistajComboBox1.getSelectedItem())));
+
+        sacadorAvalista.addEndereco(enderecoSacAvalista);
+
+        GerarBoletojTabbedPane.setSelectedIndex(3);
+    }//GEN-LAST:event_Avançar2jButtonActionPerformed
+
+    private void Avançar4jButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Avançar4jButtonActionPerformed
+
+        String texto;
+
+        if (NumeroDocumentojTextField1.getText().trim().isEmpty() || NumeroDocumentojTextField1.getText() == null) {
+            JOptionPane.showMessageDialog(null, "Campo de numero do documento está vazio.");
+            return;
+        }
+
+        texto = NumeroDocumentojTextField1.getText().trim().replaceAll("[^0123456789]", "");
+
+        if (Utilitarios.Validacao.isNullOrEmpty(texto)) {
+            JOptionPane.showMessageDialog(null, "Campo de numero do documento deve conter apenas números.");
+            NumeroDocumentojTextField1.setText("");
+            return;
+        }
+
+        texto = NossoNumerojTextField2.getText().trim().replaceAll("[^0123456789]", "");
+
+        if (Utilitarios.Validacao.isNullOrEmpty(texto)) {
+            JOptionPane.showMessageDialog(null, "CPF/CNPJ não pode ser um campo em branco.");
+            return;
+        }
+
+        if (texto.length() <= 11) {
+
+            if (!Utilitarios.Validacao.isCPF(texto.trim())) {
+
+                JOptionPane.showMessageDialog(null, "CPF/CNPJ inválido, digite somente números.");
+                NossoNumerojTextField2.setText("");
+                return;
+            }
+        } else {
+
+            if (!Utilitarios.Validacao.isCNPJ(texto.trim())) {
+
+                JOptionPane.showMessageDialog(null, "CPF/CNPJ inválido, digite somente números.");
+                NossoNumerojTextField2.setText("");
+                return;
+            }
+        }
+
+        if (Utilitarios.Validacao.isNullOrEmpty(DigitoNossoNumerojTextField1.getText())) {
+            JOptionPane.showMessageDialog(null, "Digito de nosso número não poder ser um campo em branco.");
+            DigitoNossoNumerojTextField1.setText("");
+            return;
+        }
+
+        if (Utilitarios.Validacao.isNullOrEmpty(ValorjTextField3.getText())) {
+            ValorjTextField3.setText("0.23");
+            return;
+        }
+
+        if (Utilitarios.Validacao.isNullOrEmpty(DataDocumentojFormattedTextField1.getText())) {
+            JOptionPane.showMessageDialog(null, "Data de documento não poder ser um campo em branco.");
+            return;
+        }
+
+        if (Utilitarios.Validacao.isNullOrEmpty(DataVencimentojFormattedTextField1.getText())) {
+            JOptionPane.showMessageDialog(null, "Data de Vencimento não poder ser um campo em branco.");
+            return;
+        }
+
+        if (Utilitarios.Validacao.isNullOrEmpty(DescontojTextField6.getText())) {
+            DescontojTextField6.setText("0.05");
+            return;
+        }
+
+        if (Utilitarios.Validacao.isNullOrEmpty(DeducaojTextField7.getText())) {
+            DeducaojTextField7.setText("0");
+            return;
+        }
+
+        if (Utilitarios.Validacao.isNullOrEmpty(MorajTextField8.getText())) {
+            MorajTextField8.setText("0");
+            return;
+        }
+
+        if (Utilitarios.Validacao.isNullOrEmpty(AcrescimojTextField9.getText())) {
+            AcrescimojTextField9.setText("0");
+            return;
+        }
+
+        if (Utilitarios.Validacao.isNullOrEmpty(ValorCobradojTextField10.getText())) {
+            ValorCobradojTextField10.setText("0");
+            return;
+        }
+
+        titulo.setAceite(Titulo.EnumAceite.valueOf(String.valueOf(AceitejComboBox.getSelectedItem())));
+        titulo.setAcrecimo(BigDecimal.valueOf(Double.valueOf(AcrescimojTextField9.getText().replace(",", "."))));
+
+        Date dataDocumento = new Date();
+        try {
+            dataDocumento = formatter.parse(DataDocumentojFormattedTextField1.getText());
+        } catch (ParseException ex) {
+            Logger.getLogger(GerarBoleto.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        titulo.setDataDoDocumento(dataDocumento);
+
+        Date dataVencimento = new Date();
+        try {
+            dataVencimento = formatter.parse(DataVencimentojFormattedTextField1.getText());
+        } catch (ParseException ex) {
+            Logger.getLogger(GerarBoleto.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        titulo.setDataDoVencimento(dataVencimento);
+
+        titulo.setDeducao(BigDecimal.valueOf(Double.valueOf(DeducaojTextField7.getText().replace(",", "."))));
+        titulo.setDesconto(BigDecimal.valueOf(Double.valueOf(DescontojTextField6.getText().replace(",", "."))));
+        titulo.setDigitoDoNossoNumero(DigitoNossoNumerojTextField1.getText());
+        titulo.setMora(BigDecimal.valueOf(Double.valueOf(MorajTextField8.getText().replace(",", "."))));
+        titulo.setNossoNumero(NossoNumerojTextField2.getText());
+        titulo.setNumeroDoDocumento(NumeroDocumentojTextField1.getText());
+        titulo.setValorCobrado(BigDecimal.valueOf(Double.valueOf(ValorCobradojTextField10.getText().replace(",", "."))));
+        titulo.setTipoDeDocumento(TipoDeTitulo.valueOf(String.valueOf(TipoDocumentojComboBox.getSelectedItem())));
+
+        GerarBoletojTabbedPane.setSelectedIndex(4);
+
+
+    }//GEN-LAST:event_Avançar4jButtonActionPerformed
+
+    private void TipoDocumentojComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TipoDocumentojComboBoxActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_NomeCedentejTextFieldActionPerformed
+    }//GEN-LAST:event_TipoDocumentojComboBoxActionPerformed
 
-    private void NomeSacadorjTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_NomeSacadorjTextFieldActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_NomeSacadorjTextFieldActionPerformed
+    private void Avancar5jButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Avancar5jButtonActionPerformed
 
-    private void UFSacadorjComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_UFSacadorjComboBoxActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_UFSacadorjComboBoxActionPerformed
+        if (Utilitarios.Validacao.isNullOrEmpty(LocalPagamentojTextField1.getText().trim())) {
+            JOptionPane.showMessageDialog(null, "Campo de local de pagamento não pode estar em branco.");
+            return;
+        }
 
-    private void LocalidadeSacadorjTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LocalidadeSacadorjTextField1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_LocalidadeSacadorjTextField1ActionPerformed
+        if (Utilitarios.Validacao.isNullOrEmpty(InstrucaoSacadojTextField2.getText().trim())) {
+            JOptionPane.showMessageDialog(null, "Campo de instrução ao sacado não pode estar em branco.");
+            return;
+        }
 
-    private void CEPSacadorjTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CEPSacadorjTextField1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_CEPSacadorjTextField1ActionPerformed
+        if (Utilitarios.Validacao.isNullOrEmpty(Instrucao01jTextField3.getText().trim())) {
+            Instrucao01jTextField3.setText("");
+        }
 
-    private void NomeSacadorAvalistajTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_NomeSacadorAvalistajTextField1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_NomeSacadorAvalistajTextField1ActionPerformed
+        if (Utilitarios.Validacao.isNullOrEmpty(Instrucao02jTextField4.getText().trim())) {
+            Instrucao02jTextField4.setText("");
+        }
 
-    private void UFSacadorAvalistajComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_UFSacadorAvalistajComboBox1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_UFSacadorAvalistajComboBox1ActionPerformed
+        if (Utilitarios.Validacao.isNullOrEmpty(Instrucao03jTextField5.getText().trim())) {
+            Instrucao03jTextField5.setText("");
+        }
 
-    private void LocalidadeSacadorAvalistajTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LocalidadeSacadorAvalistajTextField2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_LocalidadeSacadorAvalistajTextField2ActionPerformed
+        if (Utilitarios.Validacao.isNullOrEmpty(Instrucao04jTextField6.getText().trim())) {
+            Instrucao04jTextField6.setText("");
+        }
 
-    private void CEPSacadorAvalistajTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CEPSacadorAvalistajTextField2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_CEPSacadorAvalistajTextField2ActionPerformed
+        if (Utilitarios.Validacao.isNullOrEmpty(Instrucao05jTextField7.getText().trim())) {
+            Instrucao05jTextField7.setText("");
+        }
 
-    private void NumeroAgenciajTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_NumeroAgenciajTextFieldActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_NumeroAgenciajTextFieldActionPerformed
+        if (Utilitarios.Validacao.isNullOrEmpty(Instrucao06jTextField8.getText().trim())) {
+            Instrucao06jTextField8.setText("");
+        }
+
+        if (Utilitarios.Validacao.isNullOrEmpty(Instrucao07jTextField9.getText().trim())) {
+            Instrucao07jTextField9.setText("");
+        }
+
+        if (Utilitarios.Validacao.isNullOrEmpty(Instrucao08jTextField10.getText().trim())) {
+            Instrucao08jTextField10.setText("");
+        }
+
+        boleto = new Boleto();
+
+        boleto.setLocalPagamento(LocalPagamentojTextField1.getText());
+        boleto.setInstrucaoAoSacado(InstrucaoSacadojTextField2.getText());
+        boleto.setInstrucao1(Instrucao01jTextField3.getText());
+        boleto.setInstrucao2(Instrucao02jTextField4.getText());
+        boleto.setInstrucao3(Instrucao03jTextField5.getText());
+        boleto.setInstrucao4(Instrucao04jTextField6.getText());
+        boleto.setInstrucao5(Instrucao05jTextField7.getText());
+        boleto.setInstrucao6(Instrucao06jTextField8.getText());
+        boleto.setInstrucao7(Instrucao07jTextField9.getText());
+        boleto.setInstrucao8(Instrucao08jTextField10.getText());
+
+        GerarBoletojTabbedPane.setSelectedIndex(5);
+    }//GEN-LAST:event_Avancar5jButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -982,6 +1567,11 @@ public class GerarBoleto extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> AceitejComboBox;
     private javax.swing.JTextField AcrescimojTextField9;
+    private javax.swing.JButton Avancar0jButton;
+    private javax.swing.JButton Avancar5jButton;
+    private javax.swing.JButton Avançar1jButton;
+    private javax.swing.JButton Avançar2jButton;
+    private javax.swing.JButton Avançar4jButton;
     private javax.swing.JTextField BairroSacadorAvalistajTextField1;
     private javax.swing.JTextField BairroSacadorjTextField;
     private javax.swing.JComboBox<String> BancojComboBox;
@@ -991,14 +1581,14 @@ public class GerarBoleto extends javax.swing.JFrame {
     private javax.swing.JTextField CPFCNPSacadorAvalistajTextField1;
     private javax.swing.JTextField CPFCNPSacadorjTextField;
     private javax.swing.JTextField CarteirajTextField;
-    private javax.swing.JTextField DataDocumentojTextField4;
-    private javax.swing.JTextField DataVencimentojTextField5;
+    private javax.swing.JFormattedTextField DataDocumentojFormattedTextField1;
+    private javax.swing.JFormattedTextField DataVencimentojFormattedTextField1;
     private javax.swing.JTextField DeducaojTextField7;
     private javax.swing.JTextField DescontojTextField6;
     private javax.swing.JTextField DigitoAgenciajTextField;
     private javax.swing.JTextField DigitoContajTextField;
     private javax.swing.JTextField DigitoNossoNumerojTextField1;
-    private javax.swing.JButton GerarBoletojButton;
+    private javax.swing.JButton GerarBoletojButton1;
     private javax.swing.JTabbedPane GerarBoletojTabbedPane;
     private javax.swing.JTextField Instrucao01jTextField3;
     private javax.swing.JTextField Instrucao02jTextField4;
@@ -1029,6 +1619,11 @@ public class GerarBoleto extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> UFSacadorjComboBox;
     private javax.swing.JTextField ValorCobradojTextField10;
     private javax.swing.JTextField ValorjTextField3;
+    private javax.swing.JButton Voltar1jButton;
+    private javax.swing.JButton Voltar2jButton;
+    private javax.swing.JButton Voltar3jButton1;
+    private javax.swing.JButton Voltar4Jbutton;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -1095,12 +1690,67 @@ public class GerarBoleto extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
 
     private String onlyNumbers(String text) {
-            
-            if(text.matches("[0-9]+")){
-                text = text.replace("-", ".");
-                text = text.replace(".", "");
-            } 
-            
-            return text;
+
+        if (text.matches("[0-9]+")) {
+            text = text.replace("-", ".");
+            text = text.replace(".", "");
+        }
+
+        return text;
     }
+
+    private void inicializarUFS() {
+        ArrayList<String> ufs = new ArrayList<>();
+
+        for (UnidadeFederativa uf : UnidadeFederativa.values()) {
+            ufs.add(uf.getSigla());
+        }
+
+        for (String uf : ufs) {
+            UFSacadorjComboBox.addItem(uf);
+            UFSacadorAvalistajComboBox1.addItem(uf);
+        }
+    }
+
+    private void inicializarTiposDocumentos() {
+
+        ArrayList<String> tiposDocumento = new ArrayList<>();
+
+        for (TipoDeTitulo tipo : TipoDeTitulo.values()) {
+            tiposDocumento.add(tipo.name());
+        }
+
+        for (String tipo : tiposDocumento) {
+            TipoDocumentojComboBox.addItem(tipo);
+        }
+
+    }
+
+    private void inicializarAceite() {
+
+        ArrayList<String> aceites = new ArrayList<>();
+
+        for (Titulo.EnumAceite aceite : Titulo.EnumAceite.values()) {
+            aceites.add(aceite.name());
+        }
+
+        for (String aceite : aceites) {
+            AceitejComboBox.addItem(aceite);
+        }
+
+    }
+
+    private void inicializarBancos() {
+
+        ArrayList<String> bancos = new ArrayList<>();
+
+        for (BancosSuportados banco : BancosSuportados.values()) {
+            bancos.add(banco.name());
+        }
+
+        for (String banco : bancos) {
+            BancojComboBox.addItem(banco);
+        }
+    }
+
 }
